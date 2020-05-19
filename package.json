@@ -1,0 +1,19 @@
+{
+    "name": "backeend",
+    "version": "1.0.0",
+    "description": "Servidor Backend Aplicativo SARGLAFT",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Alex Bautista",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.17.1",
+        "mongoose": "^5.9.15"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    }
+}
