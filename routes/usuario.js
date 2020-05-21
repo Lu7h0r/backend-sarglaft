@@ -12,27 +12,38 @@ var Usuario = require('../models/usuario');
 // Obtener todos los usuarios
 // ==========================================
 app.get('/', (req, res, next) => {
+    var desde = req.query.desde || 0;
+    // Harcodeamos el numero, para que el usuario no lo rompa poniendo lo que no es...
+    desde = Number(desde);
     // Este segundo parametro en el .find() es para devolver los campos en el arreglo
     // & pues obviamente no le voy a devolver el password
-    Usuario.find({}, 'nombre email role').exec((err, usuarios) => {
-        if (err) {
-            // Cambiamos el código del error ya que estaria fallando
-            return res.status(500).json({
-                // & pues el ok en este caso nos devolveria un false
-                ok: false,
-                // personalizamos el mensaje para el error
-                mensaje: 'Error cargando Usuarios',
-                // y finalmente mostramos algo del error
-                errors: err,
+    Usuario.find({}, 'nombre email role')
+        .skip(desde)
+        // paginamos a 5 los resultados
+        .limit(5)
+        .exec((err, usuarios) => {
+            if (err) {
+                // Cambiamos el código del error ya que estaria fallando
+                return res.status(500).json({
+                    // & pues el ok en este caso nos devolveria un false
+                    ok: false,
+                    // personalizamos el mensaje para el error
+                    mensaje: 'Error cargando Usuarios',
+                    // y finalmente mostramos algo del error
+                    errors: err,
+                });
+            }
+            // Contamos la cantidad de usuarios registrados desde la DB
+            Usuario.count({}, (err, conteo) => {
+                // Si no sucede ningun error pues le damos el OK
+                res.status(200).json({
+                    ok: true,
+                    // Como todo esta OK, simplemente retorno un arreglo con los usuarios
+                    usuarios: usuarios,
+                    total: conteo,
+                });
             });
-        }
-        // Si no sucede ningun error pues le damos el OK
-        res.status(200).json({
-            ok: true,
-            // Como todo esta OK, simplemente retorno un arreglo con los usuarios
-            usuarios: usuarios,
         });
-    });
 });
 // ==========================================
 // Actualizar usuario

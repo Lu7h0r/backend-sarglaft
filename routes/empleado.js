@@ -7,21 +7,34 @@ var Empleado = require('../models/empleado');
 // Obtener todos los empleados
 // ==========================================
 app.get('/', (req, res, next) => {
-    Empleado.find({}).exec((err, empleados) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error cargando Empleados',
-                errors: err,
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    Empleado.find({})
+        .skip(desde)
+        .limit(5)
+        // Traigo datos de quien creo este stakeholders
+        .populate('usuario', 'nombre email')
+        // & me traigo el stakeholder al que pertenece: Cliente, Proveedor, Empleado
+        .populate('stakeholder', 'nombre')
+        .exec((err, empleados) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando Empleados',
+                    errors: err,
+                });
+            }
+            // Contamos la cantidad de usuarios registrados desde la DB
+            Empleado.count({}, (err, conteo) => {
+                // Si no sucede ningun error pues le damos el OK
+                res.status(200).json({
+                    ok: true,
+                    // Como todo esta OK, simplemente retorno un arreglo con los usuarios
+                    empleados: empleados,
+                    total: conteo,
+                });
             });
-        }
-        // Si no sucede ningun error pues le damos el OK
-        res.status(200).json({
-            ok: true,
-            // Como todo esta OK, simplemente retorno un arreglo con los usuarios
-            empleados: empleados,
         });
-    });
 });
 // ==========================================
 // Actualizar Empleado

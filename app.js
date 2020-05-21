@@ -40,8 +40,12 @@ var stakeholderRoutes = require('./routes/stakeholder');
 var clienteRoutes = require('./routes/cliente');
 var proveedorRoutes = require('./routes/proveedor');
 var empleadoRoutes = require('./routes/empleado');
+var busquedaRoutes = require('./routes/busqueda');
+var uploadRoutes = require('./routes/upload');
 
 // Rutas
+app.use('/upload', uploadRoutes);
+app.use('/busqueda', busquedaRoutes);
 app.use('/empleado', empleadoRoutes);
 app.use('/proveedor', proveedorRoutes);
 app.use('/cliente', clienteRoutes);

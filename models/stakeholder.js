@@ -5,4 +5,4 @@ var stakeholderSchema = new Schema({
     img: { type: String, required: false },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' },
 }, { collection: 'stakeholders' });
-module.exports = mongoose.model('stakeholder', stakeholderSchema);
+module.exports = mongoose.model('Stakeholder', stakeholderSchema);

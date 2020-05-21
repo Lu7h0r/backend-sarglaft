@@ -7,22 +7,37 @@ var Cliente = require('../models/cliente');
 // Obtener todos los clientes
 // ==========================================
 app.get('/', (req, res, next) => {
-    Cliente.find({}).exec((err, clientes) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error cargando Clientes',
-                errors: err,
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    Cliente.find({})
+        .skip(desde)
+        // paginamos a 5 los resultados
+        .limit(5)
+        // Traigo datos de quien creo este stakeholders
+        .populate('usuario', 'nombre email')
+        // & me traigo el stakeholder al que pertenece: Cliente, Proveedor, Empleado
+        .populate('stakeholder', 'nombre')
+        .exec((err, clientes) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando Clientes',
+                    errors: err,
+                });
+            }
+            // Contamos la cantidad de usuarios registrados desde la DB
+            Cliente.count({}, (err, conteo) => {
+                // Si no sucede ningun error pues le damos el OK
+                res.status(200).json({
+                    ok: true,
+                    // Como todo esta OK, simplemente retorno un arreglo con los usuarios
+                    clientes: clientes,
+                    total: conteo,
+                });
             });
-        }
-        // Si no sucede ningun error pues le damos el OK
-        res.status(200).json({
-            ok: true,
-            // Como todo esta OK, simplemente retorno un arreglo con los usuarios
-            clientes: clientes,
         });
-    });
 });
+
 // ==========================================
 // Actualizar Cliente
 // ==========================================

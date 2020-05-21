@@ -9,25 +9,28 @@ var Stakeholder = require('../models/stakeholder');
 app.get('/', (req, res, next) => {
     // Este segundo parametro en el .find() es para devolver los campos en el arreglo
     // & pues obviamente no le voy a devolver el password
-    Stakeholder.find({}).exec((err, stakeholders) => {
-        if (err) {
-            // Cambiamos el código del error ya que estaria fallando
-            return res.status(500).json({
-                // & pues el ok en este caso nos devolveria un false
-                ok: false,
-                // personalizamos el mensaje para el error
-                mensaje: 'Error cargando Stakeholders',
-                // y finalmente mostramos algo del error
-                errors: err,
+    Stakeholder.find({})
+        // Traigo quien creo esta entidad de stakeholder, ya sea: Cliente, Proveedor o Empleado & puede que existan algunas mas
+        .populate('usuario', 'nombre email')
+        .exec((err, stakeholders) => {
+            if (err) {
+                // Cambiamos el código del error ya que estaria fallando
+                return res.status(500).json({
+                    // & pues el ok en este caso nos devolveria un false
+                    ok: false,
+                    // personalizamos el mensaje para el error
+                    mensaje: 'Error cargando Stakeholders',
+                    // y finalmente mostramos algo del error
+                    errors: err,
+                });
+            }
+            // Si no sucede ningun error pues le damos el OK
+            res.status(200).json({
+                ok: true,
+                // Como todo esta OK, simplemente retorno un arreglo con los usuarios
+                stakeholders: stakeholders,
             });
-        }
-        // Si no sucede ningun error pues le damos el OK
-        res.status(200).json({
-            ok: true,
-            // Como todo esta OK, simplemente retorno un arreglo con los usuarios
-            stakeholders: stakeholders,
         });
-    });
 });
 // ==========================================
 // Actualizar Stakeholder
