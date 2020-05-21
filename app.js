@@ -42,8 +42,10 @@ var proveedorRoutes = require('./routes/proveedor');
 var empleadoRoutes = require('./routes/empleado');
 var busquedaRoutes = require('./routes/busqueda');
 var uploadRoutes = require('./routes/upload');
+var archivosRoutes = require('./routes/archivos');
 
 // Rutas
+app.use('/archivos', archivosRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/busqueda', busquedaRoutes);
 app.use('/empleado', empleadoRoutes);

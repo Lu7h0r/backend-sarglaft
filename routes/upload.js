@@ -14,10 +14,12 @@ var Usuario = require('../models/usuario');
 app.use(fileUpload());
 
 app.put('/:tipo/:id', (req, res, next) => {
+    // Tipo es a donde queremos mandar los archivos, pueden ser los stakeholders o usuarios
     var tipo = req.params.tipo;
+    // & el id pues para asignarselo
     var id = req.params.id;
 
-    // tipos de colecion
+    // tipos de colecion donde se podran asignar los archivos subidos
 
     var tiposValidos = [
         'stakeholders',
@@ -26,6 +28,7 @@ app.put('/:tipo/:id', (req, res, next) => {
         'empleados',
         'usuarios',
     ];
+    // Validamos que lo que nos manden sea lpo que queremos
     if (tiposValidos.indexOf(tipo) < 0) {
         res.status(400).json({
             ok: false,
@@ -33,7 +36,7 @@ app.put('/:tipo/:id', (req, res, next) => {
             errors: { message: 'El tipo de colección no es valida' },
         });
     }
-
+    // comprobamos que nos manden algo o que no este vacio
     if (!req.files) {
         return res.status(400).json({
             ok: false,
@@ -45,19 +48,21 @@ app.put('/:tipo/:id', (req, res, next) => {
     // obtener tipo de archivo
 
     var archivo = req.files.imagen;
-    var splitExtension = archivo.name.split('.');
-    var extensionArchivo = splitExtension[splitExtension.length - 1];
+    var nombreCortado = archivo.name.split('.');
+    var extensionArchivo = nombreCortado[nombreCortado.length - 1];
 
     // Aceptamoos el tipo de extensiones
 
     var extensionesValidas = ['png', 'jpg', 'gif', 'jpeg', 'pdf'];
 
+    // alidamos que nos envien los tipos de extensiones que asignamos
+
     if (extensionesValidas.indexOf(extensionArchivo) < 0) {
         return res.status(400).json({
             ok: false,
-            mensaje: 'Extensión no valida',
+            mensaje: 'Extensión no válida',
             errors: {
-                message: 'Las extensiones validas son:' + extensionesValidas.join(', '),
+                message: 'Las extensiones válidas son:' + extensionesValidas.join(', '),
             },
         });
     }
@@ -72,7 +77,7 @@ app.put('/:tipo/:id', (req, res, next) => {
 
     archivo.mv(path, (err) => {
         if (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 ok: false,
                 mensaje: 'Error al mover adjunto',
                 errors: err,
@@ -84,7 +89,7 @@ app.put('/:tipo/:id', (req, res, next) => {
         // res.status(200).json({
         //     ok: true,
         //     mensaje: 'Archivo subido correctamente',
-        //     splitExtension: extensionArchivo,
+        //     nombreCortado: extensionArchivo,
         // });
     });
 });
@@ -112,6 +117,102 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
                     ok: true,
                     mensaje: 'Imagen de Stakeholder Actualizada correctamente',
                     stakeholder: stakeholderActualizado,
+                });
+            });
+        });
+    }
+    if (tipo === 'clientes') {
+        Cliente.findById(id, (err, cliente) => {
+            if (!cliente) {
+                return res.status(400).json({
+                    ok: true,
+                    mensaje: 'Cliente no existe',
+                    errors: { message: 'Cliente no existe' },
+                });
+            }
+            var pathViejo = './uploads/clientes' + cliente.img;
+            if (fs.existsSync(pathViejo)) {
+                fs.unlink(pathViejo);
+            }
+
+            cliente.img = nombreArchivo;
+            cliente.save((err, clienteActualizado) => {
+                return res.status(200).json({
+                    ok: true,
+                    mensaje: 'Imagen de cliente Actualizada correctamente',
+                    cliente: clienteActualizado,
+                });
+            });
+        });
+    }
+    if (tipo === 'empleados') {
+        Empleado.findById(id, (err, empleado) => {
+            if (!empleado) {
+                return res.status(400).json({
+                    ok: true,
+                    mensaje: 'Empleado no existe',
+                    errors: { message: 'Empleado no existe' },
+                });
+            }
+            var pathViejo = './uploads/empleados' + empleado.img;
+            if (fs.existsSync(pathViejo)) {
+                fs.unlink(pathViejo);
+            }
+
+            empleado.img = nombreArchivo;
+            empleado.save((err, empleadoActualizado) => {
+                return res.status(200).json({
+                    ok: true,
+                    mensaje: 'Imagen de empleado Actualizada correctamente',
+                    empleado: empleadoActualizado,
+                });
+            });
+        });
+    }
+    if (tipo === 'proveedores') {
+        Proveedor.findById(id, (err, proveedor) => {
+            if (!proveedor) {
+                return res.status(400).json({
+                    ok: true,
+                    mensaje: 'Proveedor no existe',
+                    errors: { message: 'Proveedor no existe' },
+                });
+            }
+            var pathViejo = './uploads/proveedores' + proveedor.img;
+            if (fs.existsSync(pathViejo)) {
+                fs.unlink(pathViejo);
+            }
+
+            proveedor.img = nombreArchivo;
+            proveedor.save((err, proveedorActualizado) => {
+                return res.status(200).json({
+                    ok: true,
+                    mensaje: 'Imagen de proveedor Actualizada correctamente',
+                    proveedor: proveedorActualizado,
+                });
+            });
+        });
+    }
+    if (tipo === 'usuarios') {
+        Usuario.findById(id, (err, usuario) => {
+            if (!usuario) {
+                return res.status(400).json({
+                    ok: true,
+                    mensaje: 'Usuario no existe',
+                    errors: { message: 'Usuario no existe' },
+                });
+            }
+            var pathViejo = './uploads/usuarios' + usuario.img;
+            if (fs.existsSync(pathViejo)) {
+                fs.unlink(pathViejo);
+            }
+
+            usuario.img = nombreArchivo;
+            usuario.save((err, usuarioActualizado) => {
+                return res.status(200).json({
+                    ok: true,
+                    mensaje: 'Imagen de usuario Actualizada correctamente',
+                    usuario: usuarioActualizado,
                 });
             });
         });
