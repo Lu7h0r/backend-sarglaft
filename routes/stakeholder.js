@@ -33,6 +33,34 @@ app.get('/', (req, res, next) => {
         });
 });
 // ==========================================
+// Obtener StakeHolder por ID
+// ==========================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    Stakeholder.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, stakeholder) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar stakeholder',
+                    errors: err,
+                });
+            }
+            if (!stakeholder) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El stakeholder con el id ' + id + 'no existe ',
+                    errors: { message: 'No existe un stakeholder con ese ID ' },
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                stakeholder: stakeholder,
+            });
+        });
+});
+// ==========================================
 // Actualizar Stakeholder
 // ==========================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {

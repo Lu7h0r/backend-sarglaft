@@ -16,13 +16,15 @@ app.use(bodyParser.json());
 
 // CORS
 
+// CORS
 app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header(
         'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept'
+        'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept'
     );
-    res.header('Access-Control.Allow-Methods', 'POST, GET, PUT, DETELE, OPTIONS');
     next();
 });
 
@@ -43,8 +45,10 @@ var empleadoRoutes = require('./routes/empleado');
 var busquedaRoutes = require('./routes/busqueda');
 var uploadRoutes = require('./routes/upload');
 var archivosRoutes = require('./routes/archivos');
+var soapRoutes = require('./routes/soap');
 
 // Rutas
+app.use('/soap', soapRoutes);
 app.use('/archivos', archivosRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/busqueda', busquedaRoutes);
